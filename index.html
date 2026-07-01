@@ -1,0 +1,2194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dororo · 12 Mundos · Hyakkimaru</title>
+    <style>
+        /* ===== RESET & BASE ===== */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg-color: #0b0b0d;
+            --panel-bg: #141416;
+            --accent-red: #aa0000;
+            --bright-red: #ff3333;
+            --text-color: #e0e0e0;
+            --gray-text: #888;
+            --col-demon: #ff3333;
+            --gold: #f0c040;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            user-select: none;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 16px;
+            border-bottom: 2px solid var(--accent-red);
+            width: 100%;
+            max-width: 1100px;
+            padding-bottom: 8px;
+        }
+        h1 {
+            color: var(--bright-red);
+            letter-spacing: 4px;
+            margin: 6px 0;
+            text-transform: uppercase;
+            font-size: 1.8rem;
+            text-shadow: 0 0 15px rgba(170,0,0,0.4);
+        }
+        .subtitle {
+            color: var(--gray-text);
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+        }
+        .controls-hint {
+            color: #555;
+            font-size: 0.7rem;
+            margin-top: 4px;
+            letter-spacing: 1px;
+        }
+        .controls-hint kbd {
+            background: #222;
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid #444;
+            color: #ccc;
+            font-size: 0.7rem;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            max-width: 1100px;
+            flex-wrap: wrap;
+        }
+        .panel {
+            background: var(--panel-bg);
+            border: 1px solid #222;
+            padding: 18px 16px;
+            border-radius: 6px;
+            flex: 1;
+            min-width: 280px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+        }
+        .anatomy-title {
+            color: var(--accent-red);
+            margin-top: 0;
+            text-transform: uppercase;
+            border-bottom: 1px solid #222;
+            padding-bottom: 8px;
+            font-size: 1.1rem;
+        }
+        .parts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            list-style: none;
+            padding: 0;
+            margin: 12px 0;
+        }
+        .parts-grid li {
+            padding: 6px 8px;
+            font-size: 0.8rem;
+            border-left: 3px solid #333;
+            background: #1a1a1c;
+            transition: all 0.3s ease;
+        }
+        .lost {
+            color: var(--gray-text);
+            text-decoration: line-through;
+        }
+        .recovered {
+            color: #00ff66;
+            border-left-color: #00ff66 !important;
+            background: #112215 !important;
+            font-weight: bold;
+            text-decoration: none;
+            box-shadow: 0 0 8px rgba(0,255,100,0.15);
+        }
+        .combat-panel {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
+            gap: 4px;
+            overflow: hidden;
+        }
+        .enemy-type-badge {
+            display: inline-block;
+            padding: 3px 14px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-radius: 12px;
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
+        #enemy-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 4px 0 8px 0;
+            color: #f0e0c0;
+            text-shadow: 0 0 10px rgba(200,100,50,0.2);
+        }
+        .hp-container {
+            width: 80%;
+            background: #1a1a1c;
+            height: 14px;
+            border: 1px solid #333;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        .hp-bar {
+            background: var(--bright-red);
+            height: 100%;
+            width: 100%;
+            transition: width 0.15s ease;
+            border-radius: 8px;
+            box-shadow: inset 0 0 8px rgba(255,50,50,0.3);
+        }
+        .hp-bar.player-hp {
+            background: #00cc66;
+            box-shadow: inset 0 0 8px rgba(0,200,100,0.3);
+        }
+        #battle-log {
+            min-height: 65px;
+            font-size: 0.85rem;
+            color: #ccc;
+            margin: 8px 0;
+            line-height: 1.5;
+            border-top: 1px dashed #222;
+            padding-top: 10px;
+            width: 100%;
+            background: #0e0e10;
+            border-radius: 4px;
+            padding: 10px 8px;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+        button {
+            background: transparent;
+            color: var(--text-color);
+            border: 1px solid var(--accent-red);
+            padding: 12px 24px;
+            font-family: inherit;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            transition: all 0.25s;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        button:hover {
+            background: var(--accent-red);
+            box-shadow: 0 0 20px rgba(170, 0, 0, 0.5);
+            transform: scale(1.01);
+        }
+        button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .hidden { display: none !important; }
+
+        /* === PANTALLA DE VICTORIA === */
+        .victory-screen {
+            text-align: center;
+            padding: 30px 20px;
+        }
+        .victory-screen h2 {
+            color: #00ff66;
+            text-shadow: 0 0 30px rgba(0,255,100,0.3);
+        }
+        .victory-word {
+            font-size: 4rem;
+            font-weight: 900;
+            letter-spacing: 12px;
+            color: #ffd700;
+            text-shadow: 0 0 40px #ffd700, 0 0 80px #ffaa00, 0 0 120px #ff8800;
+            animation: victoryPulse 1.2s ease-in-out infinite alternate;
+            margin: 20px 0;
+        }
+        @keyframes victoryPulse {
+            0% { transform: scale(1); opacity: 0.8; text-shadow: 0 0 30px #ffd700, 0 0 60px #ffaa00; }
+            100% { transform: scale(1.15); opacity: 1; text-shadow: 0 0 60px #ffd700, 0 0 120px #ff8800, 0 0 180px #ff4400; }
+        }
+
+        /* === PANTALLA DE GAME OVER === */
+        .game-over-screen {
+            text-align: center;
+            padding: 30px 20px;
+        }
+        .game-over-screen h2 {
+            color: #ff3333;
+            text-shadow: 0 0 30px rgba(255,0,0,0.3);
+        }
+        .gameover-word {
+            font-size: 4rem;
+            font-weight: 900;
+            letter-spacing: 8px;
+            color: #ff0000;
+            text-shadow: 0 0 40px #ff0000, 0 0 80px #cc0000, 0 0 120px #880000;
+            animation: gameoverPulse 0.8s ease-in-out infinite alternate;
+            margin: 20px 0;
+        }
+        @keyframes gameoverPulse {
+            0% { transform: scale(1); opacity: 0.9; text-shadow: 0 0 30px #ff0000, 0 0 60px #cc0000; }
+            100% { transform: scale(1.1); opacity: 1; text-shadow: 0 0 60px #ff0000, 0 0 120px #cc0000, 0 0 180px #880000; }
+        }
+
+        .scene-container {
+            background: #0a0a12;
+            border-radius: 8px;
+            border: 1px solid #1a1a2a;
+            padding: 8px;
+            margin-bottom: 10px;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            height: 450px;
+            image-rendering: pixelated;
+        }
+        #world-map {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            border-radius: 4px;
+            transition: background 0.8s ease;
+        }
+        .platform {
+            position: absolute;
+            z-index: 3;
+            background: linear-gradient(180deg, #6a8a5a, #4a6a3a);
+            border-radius: 4px;
+            border: 2px solid #3a5a2a;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
+        }
+        /* Espacio para bajar de la plataforma - borde inferior transparente */
+        .platform::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: transparent;
+            pointer-events: none;
+        }
+        .platform-tiny { width: 40px; height: 10px; }
+        .platform-small { width: 60px; height: 12px; }
+        .platform-medium { width: 100px; height: 12px; }
+        .platform-large { width: 150px; height: 12px; }
+        .platform-extra { width: 200px; height: 12px; }
+        .platform-wide { width: 250px; height: 12px; }
+        .platform-slim { width: 80px; height: 10px; }
+
+        .treasure {
+            position: absolute;
+            font-size: 1.8rem;
+            z-index: 5;
+            animation: treasureGlow 1.5s ease-in-out infinite;
+            background: rgba(255,215,0,0.15);
+            border-radius: 50%;
+            padding: 4px;
+            border: 2px solid rgba(255,215,0,0.3);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+        .treasure.collected {
+            opacity: 0.3;
+            transform: scale(0.5);
+            pointer-events: none;
+            animation: none;
+        }
+        @keyframes treasureGlow {
+            0%, 100% { box-shadow: 0 0 10px rgba(255,215,0,0.2); transform: scale(1); }
+            50% { box-shadow: 0 0 30px rgba(255,215,0,0.6); transform: scale(1.1); }
+        }
+        .interactive-object {
+            position: absolute;
+            font-size: 1.6rem;
+            z-index: 5;
+            animation: pulse 2s ease-in-out infinite;
+            background: rgba(255,215,0,0.1);
+            border-radius: 8px;
+            padding: 2px 6px;
+            border: 1px solid rgba(255,215,0,0.3);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 5px rgba(255,215,0,0.2); }
+            50% { box-shadow: 0 0 20px rgba(255,215,0,0.5); }
+        }
+        .interactive-object.solved {
+            opacity: 0.4;
+            transform: scale(0.7);
+            animation: none;
+            border-color: #00ff66;
+        }
+        .dungeon-door {
+            position: absolute;
+            font-size: 2.2rem;
+            z-index: 5;
+            animation: doorGlow 1.5s ease-in-out infinite;
+            background: rgba(170,0,0,0.2);
+            border-radius: 8px;
+            padding: 4px 8px;
+            border: 2px solid var(--accent-red);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+        .dungeon-door.unlocked {
+            border-color: #00ff66;
+            background: rgba(0,255,100,0.2);
+            animation: doorUnlocked 1s ease-in-out infinite;
+        }
+        @keyframes doorUnlocked {
+            0%, 100% { box-shadow: 0 0 10px rgba(0,255,100,0.3); }
+            50% { box-shadow: 0 0 40px rgba(0,255,100,0.6); }
+        }
+        @keyframes doorGlow {
+            0%, 100% { box-shadow: 0 0 10px rgba(170,0,0,0.3); }
+            50% { box-shadow: 0 0 30px rgba(170,0,0,0.6); }
+        }
+        .dungeon-label {
+            position: absolute;
+            color: #ff6666;
+            font-size: 0.6rem;
+            background: rgba(0,0,0,0.7);
+            padding: 2px 6px;
+            border-radius: 4px;
+            white-space: nowrap;
+            z-index: 6;
+            border: 1px solid var(--accent-red);
+            pointer-events: none;
+        }
+        #dungeon-map {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: #0a0a0a;
+            overflow: hidden;
+            border-radius: 4px;
+            display: none;
+        }
+        .hyakki-sprite-img {
+            position: absolute;
+            z-index: 10;
+            pointer-events: none;
+            transition: left 0.08s ease, top 0.08s ease;
+            width: 48px;
+            height: 48px;
+            image-rendering: pixelated;
+        }
+        .hyakki-sprite-img.idle { animation: floatIdle 2s ease-in-out infinite; }
+        .hyakki-sprite-img.attacking { animation: slashAttack 0.4s ease; }
+        .hyakki-sprite-img.hit { animation: hitFlash 0.3s ease; }
+        .hyakki-sprite-img.jumping { animation: jumpAnim 0.5s ease; }
+        .hyakki-sprite-img.double-jumping { animation: doubleJumpAnim 0.6s ease; }
+        .hyakki-sprite-img.walk1 { animation: walkAnim1 0.3s ease; }
+        .hyakki-sprite-img.walk2 { animation: walkAnim2 0.3s ease; }
+        .hyakki-sprite-img.falling { animation: fallAnim 0.3s ease; }
+        @keyframes fallAnim {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(8px); opacity: 0.8; }
+        }
+        @keyframes walkAnim1 { 0%,100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-3px) rotate(-2deg); } }
+        @keyframes walkAnim2 { 0%,100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(3px) rotate(2deg); } }
+        @keyframes floatIdle { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+        @keyframes slashAttack {
+            0% { transform: translateX(0) scale(1) rotate(0deg); }
+            25% { transform: translateX(15px) scale(1.1) rotate(-8deg); }
+            50% { transform: translateX(20px) scale(1.2) rotate(8deg); }
+            75% { transform: translateX(10px) scale(1.1) rotate(-4deg); }
+            100% { transform: translateX(0) scale(1) rotate(0deg); }
+        }
+        @keyframes hitFlash {
+            0%,100% { opacity: 1; }
+            25% { opacity: 0.2; transform: translateX(-5px); }
+            50% { opacity: 1; transform: translateX(5px); }
+            75% { opacity: 0.3; transform: translateX(-3px); }
+        }
+        @keyframes jumpAnim {
+            0% { transform: translateY(0) scale(1); }
+            30% { transform: translateY(-25px) scale(0.9); }
+            50% { transform: translateY(-35px) scale(0.8); }
+            70% { transform: translateY(-15px) scale(0.95); }
+            100% { transform: translateY(0) scale(1); }
+        }
+        @keyframes doubleJumpAnim {
+            0% { transform: translateY(0) scale(1); }
+            20% { transform: translateY(-20px) scale(0.9); }
+            40% { transform: translateY(-40px) scale(0.75); }
+            60% { transform: translateY(-50px) scale(0.7); }
+            80% { transform: translateY(-20px) scale(0.85); }
+            100% { transform: translateY(0) scale(1); }
+        }
+        .demon-pixel {
+            z-index: 8;
+            text-shadow: 0 0 10px rgba(200,50,50,0.2);
+            transition: left 0.15s ease, top 0.15s ease;
+            font-size: 0.75rem;
+        }
+        .demon-pixel.demon-feline { color: #e06050; }
+        .demon-pixel.attacking { animation: enemyAttack 0.4s ease; }
+        @keyframes enemyAttack {
+            0% { transform: translateX(0) scale(1); }
+            30% { transform: translateX(-15px) scale(1.1); }
+            60% { transform: translateX(-20px) scale(1.2); }
+            100% { transform: translateX(0) scale(1); }
+        }
+        .demon-projectile {
+            position: absolute;
+            font-size: 1.8rem;
+            z-index: 7;
+            pointer-events: none;
+        }
+        .demon-projectile.fire { color: #ff4400; text-shadow: 0 0 30px #ff4400, 0 0 60px #ff2200; }
+        .demon-projectile.ice { color: #00ccff; text-shadow: 0 0 30px #00ccff, 0 0 60px #0088ff; }
+        .demon-projectile.dark { color: #9900cc; text-shadow: 0 0 30px #9900cc, 0 0 60px #660099; }
+        .slash-effect {
+            position: absolute;
+            font-size: 2rem;
+            color: #ffdd44;
+            text-shadow: 0 0 20px #ff8800, 0 0 40px #ff4400, 0 0 60px #ff2200;
+            z-index: 20;
+            pointer-events: none;
+            opacity: 0;
+            font-weight: bold;
+        }
+        .slash-effect.active { animation: slashFlash 0.5s ease forwards; }
+        @keyframes slashFlash {
+            0% { opacity: 1; transform: scale(0.3) rotate(-30deg); }
+            30% { opacity: 1; transform: scale(1.8) rotate(15deg); }
+            60% { opacity: 0.8; transform: scale(2.2) rotate(-5deg); }
+            100% { opacity: 0; transform: scale(2.8) rotate(0deg); }
+        }
+        .stat-badge {
+            background: #1c1c1e;
+            padding: 2px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            border: 1px solid #333;
+        }
+        .row-flex {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 6px;
+            align-items: center;
+            margin: 4px 0;
+        }
+        .part-counter { color: var(--bright-red); font-weight: bold; }
+        .player-hp-text { color: #00cc66; font-weight: bold; }
+        .mode-indicator {
+            color: var(--gold);
+            font-size: 0.8rem;
+            margin: 4px 0;
+            padding: 4px 12px;
+            border: 1px solid var(--gold);
+            border-radius: 4px;
+            display: inline-block;
+        }
+        .puzzle-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.92);
+            z-index: 30;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .puzzle-overlay.active { display: flex; }
+        .puzzle-box {
+            background: #1a1a2a;
+            border: 2px solid var(--gold);
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+        .puzzle-box h3 { color: var(--gold); margin-bottom: 16px; font-size: 1.2rem; }
+        .puzzle-box p { color: #ccc; margin-bottom: 16px; line-height: 1.6; }
+        .puzzle-input {
+            background: #0a0a12;
+            color: #fff;
+            border: 1px solid var(--gold);
+            padding: 10px 16px;
+            font-size: 1.2rem;
+            width: 80%;
+            max-width: 300px;
+            text-align: center;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            margin: 8px 0;
+        }
+        .puzzle-input:focus {
+            outline: none;
+            border-color: #ffaa00;
+            box-shadow: 0 0 20px rgba(255,215,0,0.2);
+        }
+        .puzzle-btn {
+            background: var(--gold);
+            color: #000;
+            border: none;
+            padding: 10px 30px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 1rem;
+            margin-top: 8px;
+            transition: all 0.3s ease;
+            font-family: 'Courier New', monospace;
+        }
+        .puzzle-btn:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(255,215,0,0.3); }
+        .puzzle-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .puzzle-hint { color: #888; font-size: 0.8rem; margin-top: 10px; }
+        .puzzle-error { color: #ff4444; margin-top: 8px; font-size: 0.9rem; }
+        .puzzle-success { color: #00ff66; margin-top: 8px; font-size: 0.9rem; }
+        .treasure-counter { color: var(--gold); font-weight: bold; }
+        .detection-ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px dashed rgba(255,255,255,0.15);
+            pointer-events: none;
+            z-index: 9;
+            width: 80px;
+            height: 80px;
+            transform: translate(-50%, -50%);
+            animation: ringPulse 2s ease-in-out infinite;
+        }
+        @keyframes ringPulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.6; }
+        }
+        .attack-indicator {
+            position: absolute;
+            font-size: 1.2rem;
+            color: #ff4444;
+            z-index: 15;
+            pointer-events: none;
+            animation: indicatorPulse 0.5s ease-in-out infinite;
+            text-shadow: 0 0 20px #ff0000;
+            font-weight: bold;
+        }
+        @keyframes indicatorPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(1.2); }
+        }
+        .world-counter {
+            color: var(--gold);
+            font-size: 1rem;
+            font-weight: bold;
+            margin: 4px 0;
+        }
+        .transition-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 50;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .transition-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+        .transition-overlay h2 {
+            color: #00ff66;
+            font-size: 2rem;
+            text-shadow: 0 0 40px rgba(0,255,100,0.3);
+        }
+        .transition-overlay p {
+            color: #aaa;
+            font-size: 1.2rem;
+            margin-top: 10px;
+        }
+        .dungeon-exit {
+            color: #00ff66;
+            font-size: 1.5rem;
+            z-index: 5;
+            animation: exitGlow 1s ease-in-out infinite;
+            background: rgba(0,255,100,0.1);
+            border-radius: 8px;
+            padding: 4px 8px;
+            border: 2px solid #00ff66;
+            position: absolute;
+            pointer-events: none;
+            display: none;
+        }
+        @keyframes exitGlow {
+            0%, 100% { box-shadow: 0 0 10px rgba(0,255,100,0.2); }
+            50% { box-shadow: 0 0 30px rgba(0,255,100,0.5); }
+        }
+        .world-enemy {
+            position: absolute;
+            z-index: 6;
+            font-size: 0.7rem;
+            line-height: 1.2;
+            white-space: pre;
+            font-family: 'Courier New', monospace;
+            border-radius: 4px;
+            padding: 2px 4px;
+            pointer-events: none;
+            transition: all 0.1s ease;
+            cursor: default;
+        }
+        .world-enemy.ayakashi {
+            color: #9b59b6;
+            border: 1px solid rgba(155,89,182,0.4);
+            background: rgba(155,89,182,0.08);
+            text-shadow: 0 0 10px rgba(155,89,182,0.3);
+        }
+        .world-enemy.samurai {
+            color: #2980b9;
+            border: 1px solid rgba(41,128,185,0.4);
+            background: rgba(41,128,185,0.08);
+            text-shadow: 0 0 10px rgba(41,128,185,0.3);
+        }
+        .world-enemy.defeated {
+            opacity: 0.2;
+            transform: scale(0.5);
+            pointer-events: none;
+            transition: all 0.5s ease;
+        }
+        .world-enemy.attacking-enemy {
+            animation: enemyPulse 0.3s ease-in-out;
+        }
+        @keyframes enemyPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); color: #ff4444; text-shadow: 0 0 20px #ff4444; }
+        }
+        .world-enemy.idle-enemy {
+            animation: floatEnemy 2s ease-in-out infinite;
+        }
+        @keyframes floatEnemy {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+        .world-enemy.damaged-enemy {
+            animation: damagedFlash 0.3s ease-in-out;
+        }
+        @keyframes damagedFlash {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.2; color: #ff0000; }
+        }
+        .food-item {
+            position: absolute;
+            font-size: 1.6rem;
+            z-index: 5;
+            animation: foodFloat 1.5s ease-in-out infinite;
+            background: rgba(255,100,100,0.1);
+            border-radius: 50%;
+            padding: 4px;
+            border: 2px solid rgba(255,100,100,0.2);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+        .food-item.collected {
+            opacity: 0;
+            transform: scale(0);
+            pointer-events: none;
+            animation: none;
+        }
+        @keyframes foodFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        .heart-item {
+            position: absolute;
+            font-size: 1.6rem;
+            z-index: 5;
+            animation: heartBeat 1s ease-in-out infinite;
+            background: rgba(255,0,0,0.1);
+            border-radius: 50%;
+            padding: 4px;
+            border: 2px solid rgba(255,0,0,0.3);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+        .heart-item.collected {
+            opacity: 0;
+            transform: scale(0);
+            pointer-events: none;
+            animation: none;
+        }
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        /* Indicador de bajada de plataforma */
+        .drop-indicator {
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255,255,255,0.2);
+            font-size: 0.5rem;
+            pointer-events: none;
+            z-index: 4;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        @media (max-width: 700px) {
+            .parts-grid { grid-template-columns: 1fr; }
+            .scene-container { height: 350px; }
+            .puzzle-box { padding: 20px; }
+            .platform-tiny { width: 30px; }
+            .platform-small { width: 40px; }
+            .platform-medium { width: 70px; }
+            .platform-large { width: 100px; }
+            .platform-extra { width: 130px; }
+            .platform-wide { width: 160px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>⬛ DORORO · HYAKKIMARU ⬛</h1>
+        <div class="subtitle">12 Mundos · Enigmas · Tesoros · Demonios</div>
+        <div class="controls-hint">
+            <kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd> Mover · <kbd>↑</kbd> x2 Doble Salto · <kbd>␣</kbd> Atacar · <kbd>↓</kbd> Bajar plataforma
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="panel">
+            <h3 class="anatomy-title">⬛ Hyakkimaru · Cuerpo Robado</h3>
+            <div class="row-flex">
+                <span class="stat-badge">⚔ sables prostéticos</span>
+                <span class="stat-badge">❤️ <span class="player-hp-text" id="player-hp-display">12</span> HP</span>
+                <span class="stat-badge">🔑 <span id="key-count">0</span> llaves</span>
+                <span class="stat-badge">💎 <span id="treasure-count" class="treasure-counter">0</span> / 5 tesoros</span>
+            </div>
+            <p style="font-size: 0.9rem; margin: 8px 0 4px 0;">Demonios vencidos: <span id="demon-count" class="part-counter">0</span> / 12</p>
+            <p style="font-size: 0.9rem; margin: 4px 0; color: var(--gold);">🌍 Mundo: <span id="world-display">1</span> / 12</p>
+            <p style="font-size: 0.7rem; color: #666; margin: 4px 0;">💡 Toca la puerta 🚪 para entrar a la mazmorra</p>
+            
+            <ul class="parts-grid" id="anatomy-list">
+                <li class="lost">Vista</li>
+                <li class="lost">Oído</li>
+                <li class="lost">Voz</li>
+                <li class="lost">Piel</li>
+                <li class="lost">Tacto</li>
+                <li class="lost">Olfato</li>
+                <li class="lost">Gusto</li>
+                <li class="lost">Brazo Izq.</li>
+                <li class="lost">Brazo Der.</li>
+                <li class="lost">Pierna Izq.</li>
+                <li class="lost">Pierna Der.</li>
+                <li class="lost">Columna vertebral</li>
+            </ul>
+        </div>
+
+        <div class="panel combat-panel">
+            <div class="scene-container" id="scene-container">
+                <div id="world-map">
+                    <img id="hyakki-sprite" class="hyakki-sprite-img idle" 
+                         src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' fill='%231a1a2a'/%3E%3Ccircle cx='24' cy='20' r='10' fill='%23f0dcc8'/%3E%3Ccircle cx='20' cy='18' r='2' fill='%23333'/%3E%3Ccircle cx='28' cy='18' r='2' fill='%23333'/%3E%3Cpath d='M20 24 Q24 28 28 24' stroke='%23333' stroke-width='2' fill='none'/%3E%3Crect x='14' y='30' width='20' height='14' rx='3' fill='%23aa0000'/%3E%3Crect x='10' y='32' width='4' height='12' rx='2' fill='%23808080'/%3E%3Crect x='34' y='32' width='4' height='12' rx='2' fill='%23808080'/%3E%3C/svg%3E"
+                         alt="Hyakkimaru"
+                         style="position:absolute; left:30%; top:78%; width:48px; height:48px;">
+
+                    <div class="detection-ring" id="detection-ring" style="position:absolute; left:30%; top:78%;"></div>
+                    <div id="slash-effect" class="slash-effect">✦</div>
+
+                    <div class="puzzle-overlay" id="puzzle-overlay">
+                        <div class="puzzle-box">
+                            <h3 id="puzzle-title">🧩 Enigma del Pergamino</h3>
+                            <p id="puzzle-text">Responde correctamente para obtener una llave.</p>
+                            <input class="puzzle-input" id="puzzle-input" type="text" placeholder="Tu respuesta..." autofocus>
+                            <button class="puzzle-btn" id="puzzle-submit">Responder</button>
+                            <div id="puzzle-feedback"></div>
+                            <div class="puzzle-hint">💡 Escribe tu respuesta y presiona Enter</div>
+                        </div>
+                    </div>
+
+                    <div class="transition-overlay" id="transition-overlay">
+                        <h2>🌍 ¡MUNDO COMPLETADO!</h2>
+                        <p id="transition-text">Preparando siguiente mundo...</p>
+                    </div>
+                </div>
+
+                <div id="dungeon-map">
+                    <div style="position:absolute; top:0; left:0; width:100%; height:100%; color:#333; font-size:0.8rem; white-space:pre; line-height:1.2; font-family:'Courier New',monospace;">
+████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+                    </div>
+                    <div id="demon-sprite" class="pixel-sprite demon-pixel demon-feline" style="position:absolute; left:45%; top:40%; display:none; font-size:0.8rem;">
+                        █████
+                        █▀▀▀█
+                        █▄▄▄█
+                        ████
+                    </div>
+                    <div id="demon-attack-text" class="attack-indicator" style="position:absolute; left:45%; top:25%; display:none;">⚡ ¡ATACA!</div>
+                    <div class="dungeon-exit" id="dungeon-exit" style="top:85%; left:45%;">🚪</div>
+                    <div style="position:absolute; top:90%; left:43%; color:#00ff66; font-size:0.6rem; z-index:5; pointer-events:none;">⬆ SALIENDO...</div>
+                </div>
+            </div>
+
+            <div style="width:100%;">
+                <div class="mode-indicator" id="mode-indicator">🌍 MUNDO ABIERTO</div>
+                
+                <div id="combat-zone">
+                    <span id="enemy-badge" class="enemy-type-badge">---</span>
+                    <div id="enemy-name">Explora las plataformas...</div>
+                    
+                    <div style="display:flex; gap:10px; width:100%; align-items:center;">
+                        <span style="font-size:0.7rem; color:#666; min-width:40px;">ENEMIGO</span>
+                        <div class="hp-container" style="flex:1;">
+                            <div id="hp-bar" class="hp-bar" style="width:0%;"></div>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:10px; width:100%; align-items:center; margin-bottom:8px;">
+                        <span style="font-size:0.7rem; color:#00cc66; min-width:40px;">HYAKKI</span>
+                        <div class="hp-container" style="flex:1;">
+                            <div id="player-hp-bar" class="hp-bar player-hp" style="width:100%;"></div>
+                        </div>
+                    </div>
+
+                    <div id="battle-log">🌍 ¡Explora! Acércate a los objetos para recogerlos.</div>
+                    
+                    <button id="attack-btn" disabled>⚔ Atacar (Espacio)</button>
+                    <div style="margin-top:4px; font-size:0.6rem; color:#555;">💡 Esquiva los ataques del demonio moviéndote</div>
+                </div>
+
+                <!-- PANTALLA DE VICTORIA con la palabra VICTORIA -->
+                <div id="win-zone" class="hidden victory-screen">
+                    <div class="victory-word">VICTORIA</div>
+                    <h2 style="color: #00ff66; margin-top: 0;">✨ ¡CUERPO COMPLETO! ✨</h2>
+                    <p>Has derrotado a los 12 demonios mayores. Hyakkimaru vuelve a ser humano. La tierra de Daigo respira.</p>
+                    <button onclick="location.reload()" style="margin-top: 20px; border-color: #00ff66; color: #00ff66;">↺ Renacer</button>
+                </div>
+
+                <!-- PANTALLA DE GAME OVER con la palabra HAS MUERTO -->
+                <div id="game-over-zone" class="hidden game-over-screen">
+                    <div class="gameover-word">HAS MUERTO</div>
+                    <h2 style="color: #ff3333; margin-top: 0;">💀 HYAKKIMARU HA CAÍDO 💀</h2>
+                    <p>El pacto de los demonios permanece. La tierra de Daigo sigue maldita...</p>
+                    <button onclick="location.reload()" style="margin-top: 20px; border-color: #ff3333; color: #ff3333;">↺ Intentar de nuevo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // 12 MUNDOS - Cada mundo tiene sus propios enigmas y diseño
+        // ============================================================
+        
+        const bodyParts = ["Vista", "Oído", "Voz", "Piel", "Tacto", "Olfato", "Gusto", "Brazo Izq.", "Brazo Der.", "Pierna Izq.", "Pierna Der.", "Columna vertebral"];
+
+        // 12 mundos con 3 enigmas únicos cada uno (36 enigmas en total)
+        const worldPuzzles = [
+            // Mundo 1 - Bosque Sagrado
+            [
+                { q: "¿Cómo se llama el protagonista del manga?", a: "hyakkimaru", h: "Comienza con H" },
+                { q: "¿Quién es el compañero de Hyakkimaru?", a: "dororo", h: "Es un niño ladrón" },
+                { q: "¿Qué perdió Hyakkimaru al nacer?", a: "cuerpo", h: "Partes de su..." }
+            ],
+            // Mundo 2 - Montaña de los Demonios
+            [
+                { q: "¿Qué nombre reciben los demonios en la serie?", a: "demonios", h: "Seres malvados" },
+                { q: "¿Quién es el padre de Hyakkimaru?", a: "daigo", h: "Señor de la tierra" },
+                { q: "¿Qué usa Hyakkimaru para combatir?", a: "katanas", h: "Armas en sus brazos" }
+            ],
+            // Mundo 3 - Llanura del Viento
+            [
+                { q: "¿Cuántos demonios debe derrotar Hyakkimaru?", a: "12", h: "Un número" },
+                { q: "¿Qué recupera al vencer demonios?", a: "cuerpo", h: "Partes de sí mismo" },
+                { q: "¿Cómo se llama el país donde ocurre la historia?", a: "japon", h: "País asiático" }
+            ],
+            // Mundo 4 - Valle de las Sombras
+            [
+                { q: "¿Qué tipo de criatura es Dororo?", a: "humano", h: "No es un demonio" },
+                { q: "¿Qué busca Dororo en su viaje?", a: "venganza", h: "Quiere justicia" },
+                { q: "¿Qué le falta a Hyakkimaru en los ojos?", a: "vista", h: "No puede ver" }
+            ],
+            // Mundo 5 - Templo Olvidado
+            [
+                { q: "¿Quién es el autor del manga Dororo?", a: "tezuka", h: "El dios del manga" },
+                { q: "¿En qué año se publicó originalmente?", a: "1967", h: "Años 60" },
+                { q: "¿Qué significa 'Dororo' en japonés?", a: "fantasma", h: "Ser espiritual" }
+            ],
+            // Mundo 6 - Ciudad de los Muertos
+            [
+                { q: "¿Qué poder tienen los brazos de Hyakkimaru?", a: "espadas", h: "Son armas" },
+                { q: "¿Cómo se llama el enemigo principal?", a: "kagemitsu", h: "El padre" },
+                { q: "¿Qué busca Hyakkimaru?", a: "humanidad", h: "Ser completo" }
+            ],
+            // Mundo 7 - Desierto de Cristal
+            [
+                { q: "¿Qué animal acompaña a Hyakkimaru?", a: "ninguno", h: "No tiene mascota" },
+                { q: "¿Cómo obtiene Hyakkimaru sus partes?", a: "luchando", h: "Combatiendo" },
+                { q: "¿Qué perdió primero Hyakkimaru?", a: "vista", h: "Los ojos" }
+            ],
+            // Mundo 8 - Bosque de los Espíritus
+            [
+                { q: "¿Quién maldijo a Hyakkimaru?", a: "demonios", h: "Seres del inframundo" },
+                { q: "¿Dónde transcurre la historia?", a: "japon feudal", h: "Época antigua" },
+                { q: "¿Qué siente Dororo por Hyakkimaru?", a: "amistad", h: "Sentimiento positivo" }
+            ],
+            // Mundo 9 - Isla de los Dragones
+            [
+                { q: "¿Cuál es el arma principal de Hyakkimaru?", a: "espada", h: "Hoja larga" },
+                { q: "¿Qué recupera al final?", a: "humanidad", h: "Ser completo" },
+                { q: "¿Qué es Daigo?", a: "tierra", h: "Lugar donde vive" }
+            ],
+            // Mundo 10 - Castillo de Hielo
+            [
+                { q: "¿Cómo se llama el manga en inglés?", a: "dororo", h: "Mismo nombre" },
+                { q: "¿Qué estilo tiene el arte de Tezuka?", a: "manga", h: "Cómics japoneses" },
+                { q: "¿Qué representa la historia?", a: "redención", h: "Segunda oportunidad" }
+            ],
+            // Mundo 11 - Cueva del Tiempo
+            [
+                { q: "¿Quién es el antagonista principal?", a: "kagemitsu", h: "El padre" },
+                { q: "¿Qué hacen los demonios?", a: "robar", h: "Quitar algo" },
+                { q: "¿Qué necesita Hyakkimaru para ser feliz?", a: "cuerpo", h: "Partes perdidas" }
+            ],
+            // Mundo 12 - Corazón del Inframundo
+            [
+                { q: "¿Cuál es el mensaje final de Dororo?", a: "esperanza", h: "Sentimiento positivo" },
+                { q: "¿Qué aprendió Hyakkimaru?", a: "humanidad", h: "Ser completo" },
+                { q: "¿Qué significa el nombre Hyakkimaru?", a: "cien demonios", h: "Muchos demonios" }
+            ]
+        ];
+
+        const demonBosses = [
+            "Ente del Fango", "Monstruo del Río", "Ghoul de la Montaña",
+            "Quimera de la Peste", "Espíritu del Bosque", "Ciervo Espectral",
+            "Zorro de Fuego", "Ente de la Tormenta", "Tarántula Sombría",
+            "Tiburón Terrestre", "Asura de la Guerra", "Kagemitsu Daigo"
+        ];
+
+        const worldColors = [
+            '#1a2a1a', // Mundo 1 - Verde oscuro
+            '#1a1a2a', // Mundo 2 - Azul oscuro
+            '#2a1a1a', // Mundo 3 - Rojo oscuro
+            '#1a2a2a', // Mundo 4 - Verde azulado
+            '#2a2a1a', // Mundo 5 - Amarillo oscuro
+            '#2a1a2a', // Mundo 6 - Púrpura
+            '#1a1a1a', // Mundo 7 - Negro
+            '#1a2a3a', // Mundo 8 - Azul profundo
+            '#3a2a1a', // Mundo 9 - Marrón
+            '#1a3a2a', // Mundo 10 - Verde turquesa
+            '#2a1a3a', // Mundo 11 - Violeta
+            '#0a0a0a'  // Mundo 12 - Negro absoluto
+        ];
+
+        const worldNames = [
+            "🌳 Bosque Sagrado", "🏔️ Montaña de los Demonios", "🌾 Llanura del Viento",
+            "🌙 Valle de las Sombras", "🏯 Templo Olvidado", "💀 Ciudad de los Muertos",
+            "🏜️ Desierto de Cristal", "🌲 Bosque de los Espíritus", "🐉 Isla de los Dragones",
+            "❄️ Castillo de Hielo", "🕯️ Cueva del Tiempo", "🔥 Corazón del Inframundo"
+        ];
+
+        // ---- Estado ----
+        let currentWorld = 0;
+        let defeatedDemonsCount = 0;
+        let playerHp = 12;
+        let maxPlayerHp = 12;
+        let keysCollected = 0;
+        let treasuresCollected = 0;
+        const maxTreasures = 5;
+        let posX = 30, posY = 78;
+        let facingRight = true;
+        let isAttacking = false;
+        let isMoving = false;
+        let walkTimer = 0;
+        let gameOver = false;
+        let isJumping = false;
+        let jumpCount = 0;
+        let maxJumps = 2;
+        let inDungeon = false;
+        let isFighting = false;
+        let currentEnemy = null;
+        let currentHp = 0, maxHp = 0;
+        let puzzleActive = false;
+        let currentPuzzleIndex = 0;
+        let velocityY = 0;
+        let gravity = 0.6;
+        let onPlatform = false;
+        let puzzleCooldown = 0;
+        let canAttack = false;
+        let attackPattern = [];
+        let currentAttackIndex = 0;
+        let enteringDungeon = false;
+        let isTransitioning = false;
+        let isInvincible = false;
+        let isAttackingEnemy = false;
+        let isDropping = false; // Para bajar de plataformas
+
+        // ---- DOM ----
+        const enemyBadge = document.getElementById('enemy-badge');
+        const enemyNameUi = document.getElementById('enemy-name');
+        const hpBarUi = document.getElementById('hp-bar');
+        const playerHpBar = document.getElementById('player-hp-bar');
+        const playerHpDisplay = document.getElementById('player-hp-display');
+        const battleLogUi = document.getElementById('battle-log');
+        const attackBtn = document.getElementById('attack-btn');
+        const demonCountUi = document.getElementById('demon-count');
+        const keyCountUi = document.getElementById('key-count');
+        const treasureCountUi = document.getElementById('treasure-count');
+        const anatomyNodes = document.getElementById('anatomy-list').children;
+        const combatZone = document.getElementById('combat-zone');
+        const winZone = document.getElementById('win-zone');
+        const gameOverZone = document.getElementById('game-over-zone');
+        const hyakkiSprite = document.getElementById('hyakki-sprite');
+        const detectionRing = document.getElementById('detection-ring');
+        const demonSprite = document.getElementById('demon-sprite');
+        const demonAttackText = document.getElementById('demon-attack-text');
+        const slashEffect = document.getElementById('slash-effect');
+        const worldMap = document.getElementById('world-map');
+        const dungeonMap = document.getElementById('dungeon-map');
+        const modeIndicator = document.getElementById('mode-indicator');
+        const dungeonExit = document.getElementById('dungeon-exit');
+        const puzzleOverlay = document.getElementById('puzzle-overlay');
+        const puzzleTitle = document.getElementById('puzzle-title');
+        const puzzleText = document.getElementById('puzzle-text');
+        const puzzleInput = document.getElementById('puzzle-input');
+        const puzzleSubmit = document.getElementById('puzzle-submit');
+        const puzzleFeedback = document.getElementById('puzzle-feedback');
+        const worldDisplay = document.getElementById('world-display');
+        const transitionOverlay = document.getElementById('transition-overlay');
+        const transitionText = document.getElementById('transition-text');
+
+        // ---- Teclado ----
+        const keys = { up: false, down: false, left: false, right: false };
+
+        document.addEventListener('keydown', (e) => {
+            const key = e.key;
+            if (key === 'ArrowUp') { keys.up = true; e.preventDefault(); if (!gameOver && !puzzleActive && !isTransitioning) performJump(); }
+            if (key === 'ArrowDown') { keys.down = true; e.preventDefault(); if (!gameOver && !puzzleActive && !isTransitioning && !inDungeon) dropThroughPlatform(); }
+            if (key === 'ArrowLeft') { keys.left = true; e.preventDefault(); }
+            if (key === 'ArrowRight') { keys.right = true; e.preventDefault(); }
+            if ((key === ' ' || key === 'Space') && !gameOver && !puzzleActive && !isTransitioning) {
+                e.preventDefault();
+                if (isFighting && canAttack) performAttack();
+                else if (!inDungeon && !isFighting) attackWorldEnemy();
+            }
+            if (key === 'Enter' && puzzleActive) { e.preventDefault(); submitPuzzle(); }
+            if (key === 'Escape' && puzzleActive) { e.preventDefault(); closePuzzle(); }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            const key = e.key;
+            if (key === 'ArrowUp') { keys.up = false; e.preventDefault(); }
+            if (key === 'ArrowDown') { keys.down = false; e.preventDefault(); }
+            if (key === 'ArrowLeft') { keys.left = false; e.preventDefault(); }
+            if (key === 'ArrowRight') { keys.right = false; e.preventDefault(); }
+        });
+
+        // ---- Función para bajar de plataforma ----
+        function dropThroughPlatform() {
+            if (gameOver || puzzleActive || isTransitioning || inDungeon || isJumping) return;
+            if (!onPlatform) return;
+            
+            // Forzar caída a través de la plataforma
+            isDropping = true;
+            onPlatform = false;
+            isJumping = true;
+            velocityY = 3; // Empuje hacia abajo
+            hyakkiSprite.classList.remove('idle');
+            hyakkiSprite.classList.add('falling');
+            
+            // Pequeña animación visual
+            setTimeout(() => {
+                isDropping = false;
+                hyakkiSprite.classList.remove('falling');
+            }, 300);
+            
+            battleLogUi.innerHTML = '⬇ Bajando de la plataforma...';
+        }
+
+        // ---- Generar mundo ----
+        function generateWorld() {
+            const map = document.getElementById('world-map');
+            const toRemove = map.querySelectorAll('.platform, .treasure, .interactive-object, .dungeon-door, .dungeon-label, .world-enemy, .food-item, .heart-item, .drop-indicator');
+            toRemove.forEach(el => el.remove());
+
+            map.style.background = worldColors[currentWorld % worldColors.length];
+
+            // Generar plataformas con indicador de bajada
+            const platforms = [
+                { type: 'platform-extra', top: '82%', left: '3%' },
+                { type: 'platform-extra', top: '82%', left: '45%' },
+                { type: 'platform-extra', top: '82%', left: '77%' },
+                { type: 'platform-large', top: '72%', left: '8%' },
+                { type: 'platform-medium', top: '70%', left: '35%' },
+                { type: 'platform-large', top: '68%', left: '55%' },
+                { type: 'platform-medium', top: '70%', left: '80%' },
+                { type: 'platform-medium', top: '58%', left: '12%' },
+                { type: 'platform-large', top: '55%', left: '40%' },
+                { type: 'platform-medium', top: '56%', left: '72%' },
+                { type: 'platform-small', top: '52%', left: '88%' },
+                { type: 'platform-small', top: '42%', left: '5%' },
+                { type: 'platform-medium', top: '38%', left: '22%' },
+                { type: 'platform-large', top: '36%', left: '48%' },
+                { type: 'platform-medium', top: '40%', left: '75%' },
+                { type: 'platform-small', top: '38%', left: '90%' },
+                { type: 'platform-tiny', top: '28%', left: '15%' },
+                { type: 'platform-small', top: '22%', left: '35%' },
+                { type: 'platform-medium', top: '18%', left: '55%' },
+                { type: 'platform-small', top: '24%', left: '78%' },
+                { type: 'platform-tiny', top: '16%', left: '88%' },
+                { type: 'platform-wide', top: '48%', left: '25%' },
+                { type: 'platform-slim', top: '32%', left: '60%' },
+            ];
+
+            platforms.forEach(p => {
+                const div = document.createElement('div');
+                div.className = `platform ${p.type}`;
+                div.style.top = p.top;
+                div.style.left = p.left;
+                map.appendChild(div);
+                
+                // Indicador visual para bajar de la plataforma
+                const indicator = document.createElement('div');
+                indicator.className = 'drop-indicator';
+                indicator.textContent = '⬇';
+                indicator.style.top = `calc(${p.top} + 12px)`;
+                indicator.style.left = p.left;
+                map.appendChild(indicator);
+            });
+
+            // Tesoros (5 por mundo)
+            const treasurePositions = [
+                { top: '68%', left: '10%' }, { top: '52%', left: '45%' },
+                { top: '34%', left: '55%' }, { top: '20%', left: '38%' },
+                { top: '14%', left: '70%' }
+            ];
+            const shuffledTreasures = treasurePositions.sort(() => Math.random() - 0.5);
+            for (let i = 0; i < 5; i++) {
+                const div = document.createElement('div');
+                div.className = 'treasure';
+                div.id = `treasure-${i + 1}`;
+                div.style.top = shuffledTreasures[i % shuffledTreasures.length].top;
+                div.style.left = shuffledTreasures[i % shuffledTreasures.length].left;
+                div.textContent = '💎';
+                map.appendChild(div);
+            }
+
+            // Pergaminos (3 por mundo)
+            const puzzlePositions = [
+                { top: '22%', left: '30%' }, 
+                { top: '50%', left: '18%' }, 
+                { top: '62%', left: '80%' }
+            ];
+            for (let i = 0; i < 3; i++) {
+                const div = document.createElement('div');
+                div.className = 'interactive-object';
+                div.id = `puzzle-${i + 1}`;
+                div.style.top = puzzlePositions[i].top;
+                div.style.left = puzzlePositions[i].left;
+                div.textContent = '📜';
+                div.dataset.solved = 'false';
+                div.dataset.index = i;
+                map.appendChild(div);
+            }
+
+            // Comida (onigiri) - 3 por mundo
+            const foodPositions = [
+                { top: '30%', left: '10%' },
+                { top: '45%', left: '55%' },
+                { top: '60%', left: '30%' }
+            ];
+            for (let i = 0; i < 3; i++) {
+                const div = document.createElement('div');
+                div.className = 'food-item';
+                div.id = `food-${i + 1}`;
+                div.style.top = foodPositions[i].top;
+                div.style.left = foodPositions[i].left;
+                div.textContent = '🍙';
+                div.dataset.collected = 'false';
+                map.appendChild(div);
+            }
+
+            // Corazones - 2 por mundo
+            const heartPositions = [
+                { top: '25%', left: '65%' },
+                { top: '55%', left: '15%' }
+            ];
+            for (let i = 0; i < 2; i++) {
+                const div = document.createElement('div');
+                div.className = 'heart-item';
+                div.id = `heart-${i + 1}`;
+                div.style.top = heartPositions[i].top;
+                div.style.left = heartPositions[i].left;
+                div.textContent = '❤️';
+                div.dataset.collected = 'false';
+                map.appendChild(div);
+            }
+
+            // Puerta
+            const door = document.createElement('div');
+            door.className = 'dungeon-door';
+            door.id = 'dungeon-door';
+            door.style.top = '12%';
+            door.style.left = '45%';
+            door.textContent = '🚪';
+            map.appendChild(door);
+
+            const label1 = document.createElement('div');
+            label1.className = 'dungeon-label';
+            label1.style.top = '19%';
+            label1.style.left = '42%';
+            label1.textContent = `⬇ ${worldNames[currentWorld]} ⬇`;
+            map.appendChild(label1);
+
+            const label2 = document.createElement('div');
+            label2.className = 'dungeon-label';
+            label2.id = 'door-status';
+            label2.style.top = '23%';
+            label2.style.left = '38%';
+            label2.style.fontSize = '0.5rem';
+            label2.style.color = '#888';
+            label2.textContent = '(Necesitas 3 llaves o 5 tesoros)';
+            map.appendChild(label2);
+
+            generateEnemies();
+
+            // Obstáculos decorativos
+            const obstacles = [
+                { top: '8%', left: '8%', emoji: '🌳' },
+                { top: '10%', left: '12%', emoji: '🌲' },
+                { top: '6%', left: '75%', emoji: '🌳' },
+                { top: '42%', left: '5%', emoji: '🌲' },
+                { top: '78%', left: '88%', emoji: '🌳' },
+                { top: '26%', left: '78%', emoji: '🪨' },
+                { top: '60%', left: '38%', emoji: '🪨' },
+                { top: '74%', left: '30%', emoji: '🌊' }
+            ];
+            obstacles.forEach(o => {
+                const div = document.createElement('div');
+                div.className = 'obstacle';
+                div.style.position = 'absolute';
+                div.style.zIndex = '2';
+                div.style.top = o.top;
+                div.style.left = o.left;
+                div.textContent = o.emoji;
+                map.appendChild(div);
+            });
+
+            // Resetear estado del mundo
+            keysCollected = 0;
+            treasuresCollected = 0;
+            keyCountUi.textContent = '0';
+            treasureCountUi.textContent = '0';
+            document.querySelectorAll('.treasure').forEach(el => el.classList.remove('collected'));
+            document.querySelectorAll('.food-item').forEach(el => el.dataset.collected = 'false');
+            document.querySelectorAll('.heart-item').forEach(el => el.dataset.collected = 'false');
+            document.querySelectorAll('.interactive-object').forEach(el => {
+                el.dataset.solved = 'false';
+                el.textContent = '📜';
+                el.className = 'interactive-object';
+            });
+            
+            const doorEl = document.getElementById('dungeon-door');
+            if (doorEl) {
+                doorEl.classList.remove('unlocked');
+            }
+            const statusEl = document.getElementById('door-status');
+            if (statusEl) {
+                statusEl.textContent = '(Necesitas 3 llaves o 5 tesoros)';
+                statusEl.style.color = '#888';
+            }
+
+            battleLogUi.innerHTML = `🌍 ${worldNames[currentWorld]}: ¡Explora! Recoge 🍙 para curarte y ❤️ para recuperar vitalidad.`;
+            worldDisplay.textContent = currentWorld + 1;
+            modeIndicator.textContent = `🌍 ${worldNames[currentWorld]}`;
+            modeIndicator.style.borderColor = 'var(--gold)';
+            
+            updateAnatomyList();
+        }
+
+        function generateEnemies() {
+            const map = document.getElementById('world-map');
+            document.querySelectorAll('.world-enemy').forEach(el => el.remove());
+
+            // 3 enemigos por mundo: 2 ayakashis y 1 samurái
+            const enemyTypes = [
+                { type: 'ayakashi', name: 'Ayakashi', damage: 1, sprite: ' ███ \n█▀█\n█▄█', color: '#9b59b6', hp: 3 },
+                { type: 'ayakashi', name: 'Ayakashi', damage: 1, sprite: ' ███ \n█▀█\n█▄█', color: '#9b59b6', hp: 3 },
+                { type: 'samurai', name: 'Samurái', damage: 2, sprite: '█████\n█▀▀▀█\n█▄▄▄█\n█████', color: '#2980b9', hp: 5 }
+            ];
+
+            // Posiciones fijas pero con variación aleatoria
+            const positions = [
+                { top: 25 + Math.random() * 10, left: 15 + Math.random() * 15 },
+                { top: 45 + Math.random() * 10, left: 60 + Math.random() * 15 },
+                { top: 55 + Math.random() * 10, left: 35 + Math.random() * 15 }
+            ];
+
+            const shuffledPos = positions.sort(() => Math.random() - 0.5);
+            
+            enemyTypes.forEach((enemy, index) => {
+                const div = document.createElement('div');
+                div.className = `world-enemy ${enemy.type} idle-enemy`;
+                div.dataset.enemyName = enemy.name;
+                div.dataset.damage = enemy.damage;
+                div.dataset.defeated = 'false';
+                div.dataset.enemyType = enemy.type;
+                div.dataset.hp = enemy.hp;
+                div.dataset.maxHp = enemy.hp;
+                div.id = `enemy-${currentWorld}-${index}`;
+                div.style.top = shuffledPos[index % shuffledPos.length].top + '%';
+                div.style.left = shuffledPos[index % shuffledPos.length].left + '%';
+                div.textContent = enemy.sprite;
+                map.appendChild(div);
+            });
+        }
+
+        function updateAnatomyList() {
+            for (let i = 0; i < bodyParts.length; i++) {
+                if (i < defeatedDemonsCount) {
+                    anatomyNodes[i].className = 'recovered';
+                } else {
+                    anatomyNodes[i].className = 'lost';
+                }
+            }
+        }
+
+        // ---- Transición entre mundos ----
+        function transitionToNextWorld() {
+            if (isTransitioning) return;
+            isTransitioning = true;
+            
+            transitionOverlay.classList.add('active');
+            transitionText.textContent = `🌍 ${worldNames[currentWorld + 1] || 'Mundo Final'}`;
+            
+            posX = 30;
+            posY = 78;
+            hyakkiSprite.style.left = posX + '%';
+            hyakkiSprite.style.top = posY + '%';
+            detectionRing.style.left = posX + '%';
+            detectionRing.style.top = posY + '%';
+            
+            setTimeout(() => {
+                currentWorld++;
+                if (currentWorld >= 12) {
+                    transitionOverlay.classList.remove('active');
+                    combatZone.classList.add('hidden');
+                    winZone.classList.remove('hidden');
+                    isTransitioning = false;
+                    return;
+                }
+                
+                generateWorld();
+                transitionOverlay.classList.remove('active');
+                isTransitioning = false;
+                
+                battleLogUi.innerHTML = `🌍 ¡Bienvenido a ${worldNames[currentWorld]}!`;
+                
+                if (playerHp < 3) {
+                    playerHp = Math.min(maxPlayerHp, playerHp + 4);
+                    updatePlayerHp();
+                    battleLogUi.innerHTML += ` ❤️ +4 HP por avanzar!`;
+                }
+            }, 1200);
+        }
+
+        // ---- Recolectar ----
+        function collectTreasure(el) {
+            if (el.classList.contains('collected')) return;
+            el.classList.add('collected');
+            treasuresCollected++;
+            treasureCountUi.textContent = treasuresCollected;
+            battleLogUi.innerHTML = `💎 ¡Tesoro! (${treasuresCollected}/${maxTreasures})`;
+            
+            if (treasuresCollected >= maxTreasures) {
+                const door = document.getElementById('dungeon-door');
+                if (door) door.classList.add('unlocked');
+                const status = document.getElementById('door-status');
+                if (status) {
+                    status.textContent = '✅ ¡Puerta desbloqueada!';
+                    status.style.color = '#00ff66';
+                }
+                battleLogUi.innerHTML = '🔓 ¡Todos los tesoros reunidos! Toca la puerta 🚪 para entrar.';
+            }
+        }
+
+        function collectFood(el) {
+            if (el.dataset.collected === 'true') return;
+            el.dataset.collected = 'true';
+            el.classList.add('collected');
+            const heal = 2;
+            playerHp = Math.min(maxPlayerHp, playerHp + heal);
+            updatePlayerHp();
+            battleLogUi.innerHTML = `🍙 ¡Comida! +${heal} HP (${playerHp}/${maxPlayerHp})`;
+        }
+
+        function collectHeart(el) {
+            if (el.dataset.collected === 'true') return;
+            el.dataset.collected = 'true';
+            el.classList.add('collected');
+            const heal = 4;
+            playerHp = Math.min(maxPlayerHp, playerHp + heal);
+            updatePlayerHp();
+            battleLogUi.innerHTML = `❤️ ¡Corazón! +${heal} HP (${playerHp}/${maxPlayerHp})`;
+        }
+
+        // ---- Enigmas ----
+        function openPuzzle(index) {
+            if (puzzleActive || isTransitioning) return;
+            const puzzleEl = document.querySelectorAll('.interactive-object')[index];
+            if (!puzzleEl || puzzleEl.dataset.solved === 'true') return;
+            
+            puzzleActive = true;
+            currentPuzzleIndex = index;
+            const puzzleData = worldPuzzles[currentWorld][index];
+            
+            puzzleTitle.textContent = `🧩 Enigma ${index + 1} - ${worldNames[currentWorld]}`;
+            puzzleText.textContent = puzzleData.q;
+            puzzleInput.value = '';
+            puzzleFeedback.innerHTML = '';
+            puzzleOverlay.classList.add('active');
+            puzzleInput.focus();
+        }
+
+        function closePuzzle() {
+            puzzleActive = false;
+            puzzleOverlay.classList.remove('active');
+            puzzleFeedback.innerHTML = '';
+        }
+
+        function submitPuzzle() {
+            const puzzleData = worldPuzzles[currentWorld][currentPuzzleIndex];
+            const answer = puzzleInput.value.trim().toLowerCase();
+            
+            if (!answer) {
+                puzzleFeedback.innerHTML = '<div class="puzzle-error">❌ Escribe una respuesta.</div>';
+                return;
+            }
+            
+            if (answer === puzzleData.a.toLowerCase()) {
+                keysCollected++;
+                keyCountUi.textContent = keysCollected;
+                puzzleFeedback.innerHTML = `<div class="puzzle-success">✅ ¡Correcto! +1 llave (${keysCollected}/3)</div>`;
+                battleLogUi.innerHTML = `✅ ¡Enigma resuelto! 🔑 (${keysCollected}/3)`;
+                puzzleSubmit.disabled = true;
+                
+                const puzzleEl = document.querySelectorAll('.interactive-object')[currentPuzzleIndex];
+                if (puzzleEl) {
+                    puzzleEl.dataset.solved = 'true';
+                    puzzleEl.textContent = '✅';
+                    puzzleEl.className = 'interactive-object solved';
+                }
+                
+                if (keysCollected >= 3) {
+                    const door = document.getElementById('dungeon-door');
+                    if (door) door.classList.add('unlocked');
+                    const status = document.getElementById('door-status');
+                    if (status) {
+                        status.textContent = '✅ ¡Puerta desbloqueada!';
+                        status.style.color = '#00ff66';
+                    }
+                    battleLogUi.innerHTML = '🔓 ¡Todas las llaves reunidas! Toca la puerta 🚪 para entrar.';
+                }
+                
+                setTimeout(() => {
+                    closePuzzle();
+                    puzzleSubmit.disabled = false;
+                }, 1500);
+            } else {
+                puzzleFeedback.innerHTML = `<div class="puzzle-error">❌ Incorrecto. Pista: ${puzzleData.h}</div>`;
+                puzzleInput.value = '';
+                puzzleInput.focus();
+            }
+        }
+
+        // ---- Combate contra enemigos de mundo ----
+        function attackWorldEnemy() {
+            if (gameOver || puzzleActive || isTransitioning || inDungeon || isFighting || isAttackingEnemy || isAttacking) return;
+            
+            const enemies = document.querySelectorAll('.world-enemy:not(.defeated)');
+            let closestEnemy = null;
+            let closestDist = Infinity;
+            
+            const playerRect = hyakkiSprite.getBoundingClientRect();
+            const playerCenterX = playerRect.left + playerRect.width / 2;
+            const playerCenterY = playerRect.top + playerRect.height / 2;
+            
+            enemies.forEach(enemy => {
+                const rect = enemy.getBoundingClientRect();
+                const enemyCenterX = rect.left + rect.width / 2;
+                const enemyCenterY = rect.top + rect.height / 2;
+                const dist = Math.sqrt(
+                    Math.pow(enemyCenterX - playerCenterX, 2) + 
+                    Math.pow(enemyCenterY - playerCenterY, 2)
+                );
+                if (dist < closestDist && dist < 100) {
+                    closestDist = dist;
+                    closestEnemy = enemy;
+                }
+            });
+            
+            if (!closestEnemy) {
+                battleLogUi.innerHTML = '⚔️ ¡No hay enemigos cerca! Acércate a un Ayakashi o Samurái.';
+                return;
+            }
+            
+            isAttackingEnemy = true;
+            const enemyName = closestEnemy.dataset.enemyName || 'Enemigo';
+            let hp = parseInt(closestEnemy.dataset.hp) || 3;
+            hp--;
+            closestEnemy.dataset.hp = hp;
+            
+            hyakkiSprite.classList.add('attacking');
+            slashEffect.classList.remove('active');
+            void slashEffect.offsetWidth;
+            slashEffect.classList.add('active');
+            slashEffect.style.left = (facingRight ? 70 : 30) + '%';
+            slashEffect.style.top = '35%';
+            
+            closestEnemy.classList.remove('idle-enemy');
+            closestEnemy.classList.add('damaged-enemy');
+            
+            if (hp <= 0) {
+                closestEnemy.dataset.defeated = 'true';
+                closestEnemy.classList.add('defeated');
+                closestEnemy.classList.remove('damaged-enemy');
+                battleLogUi.innerHTML = `⚔️ ¡${enemyName} derrotado!`;
+                
+                const heal = 1;
+                playerHp = Math.min(maxPlayerHp, playerHp + heal);
+                updatePlayerHp();
+                battleLogUi.innerHTML += ` ❤️ +${heal} HP por la victoria!`;
+                
+                setTimeout(() => {
+                    closestEnemy.style.display = 'none';
+                }, 500);
+            } else {
+                battleLogUi.innerHTML = `⚔️ ¡Golpe a ${enemyName}! (❤️ ${hp}/${closestEnemy.dataset.maxHp})`;
+                setTimeout(() => {
+                    closestEnemy.classList.remove('damaged-enemy');
+                    if (!closestEnemy.classList.contains('defeated')) {
+                        closestEnemy.classList.add('idle-enemy');
+                    }
+                }, 300);
+            }
+            
+            setTimeout(() => {
+                isAttackingEnemy = false;
+                hyakkiSprite.classList.remove('attacking');
+                if (!isJumping && !isMoving) hyakkiSprite.classList.add('idle');
+                slashEffect.classList.remove('active');
+            }, 450);
+        }
+
+        // ---- Interacciones automáticas ----
+        function checkAutoInteractions() {
+            if (puzzleActive || inDungeon || isFighting || isTransitioning) return;
+            
+            document.querySelectorAll('.treasure:not(.collected)').forEach(el => {
+                const rect = el.getBoundingClientRect();
+                const playerRect = hyakkiSprite.getBoundingClientRect();
+                if (Math.sqrt(Math.pow(playerRect.left - rect.left, 2) + Math.pow(playerRect.top - rect.top, 2)) < 40) {
+                    collectTreasure(el);
+                }
+            });
+
+            document.querySelectorAll('.food-item:not(.collected)').forEach(el => {
+                const rect = el.getBoundingClientRect();
+                const playerRect = hyakkiSprite.getBoundingClientRect();
+                if (Math.sqrt(Math.pow(playerRect.left - rect.left, 2) + Math.pow(playerRect.top - rect.top, 2)) < 40) {
+                    collectFood(el);
+                }
+            });
+
+            document.querySelectorAll('.heart-item:not(.collected)').forEach(el => {
+                const rect = el.getBoundingClientRect();
+                const playerRect = hyakkiSprite.getBoundingClientRect();
+                if (Math.sqrt(Math.pow(playerRect.left - rect.left, 2) + Math.pow(playerRect.top - rect.top, 2)) < 40) {
+                    collectHeart(el);
+                }
+            });
+
+            if (puzzleCooldown > 0) { puzzleCooldown--; return; }
+            document.querySelectorAll('.interactive-object:not(.solved)').forEach((el, index) => {
+                const rect = el.getBoundingClientRect();
+                const playerRect = hyakkiSprite.getBoundingClientRect();
+                if (Math.sqrt(Math.pow(playerRect.left - rect.left, 2) + Math.pow(playerRect.top - rect.top, 2)) < 45) {
+                    puzzleCooldown = 30;
+                    openPuzzle(index);
+                }
+            });
+
+            const door = document.getElementById('dungeon-door');
+            if (!door) return;
+            const doorRect = door.getBoundingClientRect();
+            const playerRect = hyakkiSprite.getBoundingClientRect();
+            if (Math.sqrt(Math.pow(playerRect.left - doorRect.left, 2) + Math.pow(playerRect.top - doorRect.top, 2)) < 60 && !inDungeon && !enteringDungeon) {
+                if (keysCollected >= 3 || treasuresCollected >= 5) {
+                    enteringDungeon = true;
+                    setTimeout(() => { toggleDungeon(); enteringDungeon = false; }, 300);
+                } else {
+                    battleLogUi.innerHTML = `🔒 Necesitas 3 llaves o 5 tesoros. (${keysCollected} llaves, ${treasuresCollected}/${maxTreasures} tesoros)`;
+                }
+            }
+        }
+
+        // ---- Detección de daño de enemigos del mundo ----
+        function checkEnemyDamage() {
+            if (isInvincible || puzzleActive || inDungeon || isFighting || isTransitioning || gameOver) return;
+            
+            document.querySelectorAll('.world-enemy:not(.defeated)').forEach(el => {
+                const rect = el.getBoundingClientRect();
+                const playerRect = hyakkiSprite.getBoundingClientRect();
+                
+                // Colisión detectada
+                if (rect.left < playerRect.right && rect.right > playerRect.left &&
+                    rect.top < playerRect.bottom && rect.bottom > playerRect.top) {
+                    
+                    const damage = parseInt(el.dataset.damage) || 1;
+                    const enemyName = el.dataset.enemyName || 'Enemigo';
+                    
+                    el.classList.remove('idle-enemy');
+                    el.classList.add('attacking-enemy');
+                    
+                    applyDamageToPlayer(damage, enemyName, el);
+                    
+                    setTimeout(() => {
+                        el.classList.remove('attacking-enemy');
+                        if (!el.classList.contains('defeated')) {
+                            el.classList.add('idle-enemy');
+                        }
+                    }, 400);
+                }
+            });
+        }
+
+        function applyDamageToPlayer(damage, enemyName, enemyEl) {
+            if (isInvincible || gameOver) return;
+            
+            playerHp = Math.max(0, playerHp - damage);
+            updatePlayerHp();
+            
+            isInvincible = true;
+            hyakkiSprite.classList.add('hit');
+            battleLogUi.innerHTML = `💥 ¡${enemyName} te ha atacado! -${damage} HP (${playerHp}/${maxPlayerHp})`;
+            
+            setTimeout(() => {
+                hyakkiSprite.classList.remove('hit');
+                isInvincible = false;
+            }, 600);
+            
+            if (playerHp <= 0) {
+                gameOver = true;
+                combatZone.classList.add('hidden');
+                gameOverZone.classList.remove('hidden');
+                // Mostrar mensaje en el battle log
+                battleLogUi.innerHTML = '💀 HAS MUERTO... Hyakkimaru ha caído.';
+            }
+        }
+
+        // ---- Mazmorra ----
+        function toggleDungeon() {
+            if (gameOver || isTransitioning) return;
+            
+            if (!inDungeon) {
+                if (keysCollected < 3 && treasuresCollected < 5) {
+                    battleLogUi.innerHTML = `🔒 Necesitas 3 llaves o 5 tesoros. (${keysCollected} llaves, ${treasuresCollected}/${maxTreasures} tesoros)`;
+                    return;
+                }
+                inDungeon = true;
+                worldMap.style.display = 'none';
+                dungeonMap.style.display = 'block';
+                modeIndicator.textContent = `🏰 MAZMORRA - ${worldNames[currentWorld]}`;
+                modeIndicator.style.borderColor = '#ff3333';
+                battleLogUi.innerHTML = '🏰 ¡Has entrado en la mazmorra!';
+                spawnDemon();
+            } else {
+                if (isFighting && currentHp > 0) {
+                    battleLogUi.innerHTML = '⚠️ ¡Derrota al demonio primero!';
+                    return;
+                }
+                inDungeon = false;
+                isFighting = false;
+                canAttack = false;
+                demonAttackText.style.display = 'none';
+                dungeonExit.style.display = 'none';
+                worldMap.style.display = 'block';
+                dungeonMap.style.display = 'none';
+                modeIndicator.textContent = `🌍 ${worldNames[currentWorld]}`;
+                modeIndicator.style.borderColor = 'var(--gold)';
+                attackBtn.disabled = true;
+                demonSprite.style.display = 'none';
+                currentEnemy = null;
+                
+                battleLogUi.innerHTML = `🌍 Has salido de la mazmorra. Demonios vencidos: ${defeatedDemonsCount}/12`;
+                
+                if (defeatedDemonsCount < 12) {
+                    transitionToNextWorld();
+                }
+            }
+        }
+
+        function spawnDemon() {
+            if (defeatedDemonsCount >= 12) return;
+
+            isFighting = true;
+            canAttack = false;
+            const idx = defeatedDemonsCount;
+            
+            currentEnemy = {
+                type: "Demonio Mayor",
+                name: demonBosses[idx],
+                hp: 8 + idx,
+                color: "var(--col-demon)",
+                isDemon: true,
+                damage: 2 + Math.floor(idx / 3),
+                spriteClass: 'demon-feline',
+                isPathEnemy: false
+            };
+
+            maxHp = currentEnemy.hp;
+            currentHp = maxHp;
+
+            demonSprite.style.display = 'block';
+            demonSprite.style.left = '45%';
+            demonSprite.style.top = '40%';
+            demonSprite.className = 'pixel-sprite demon-pixel demon-feline';
+            demonSprite.textContent = [' ███ ', '█▀▀▀█', '█▄▄▄█', ' ███ '].join('\n');
+
+            enemyBadge.textContent = currentEnemy.type;
+            enemyBadge.style.backgroundColor = currentEnemy.color;
+            enemyNameUi.textContent = currentEnemy.name;
+            battleLogUi.innerHTML = `${currentEnemy.name} emerge!<br><span style="color:#ffaa00;">⚡ Custodia: "${bodyParts[idx]}"</span>`;
+            updateHpBar();
+            attackBtn.disabled = true;
+            
+            setTimeout(() => {
+                if (isFighting && currentEnemy) startDemonCombat();
+            }, 1000);
+        }
+
+        function startDemonCombat() {
+            canAttack = false;
+            currentAttackIndex = 0;
+            
+            const patterns = [
+                ['fire', 'fire', 'ice', 'dark'],
+                ['ice', 'dark', 'fire', 'ice'],
+                ['dark', 'fire', 'dark', 'ice', 'fire'],
+                ['fire', 'ice', 'dark', 'fire', 'ice', 'dark']
+            ];
+            attackPattern = patterns[Math.floor(Math.random() * patterns.length)];
+            
+            battleLogUi.innerHTML = `⚔️ ¡${currentEnemy.name} se prepara para atacar!<br>💡 Esquiva sus ataques moviéndote.`;
+            demonAttackText.style.display = 'block';
+            demonAttackText.textContent = '⚡ ¡PREPARANDO ATAQUE!';
+            demonAttackText.style.color = '#ffaa00';
+            
+            setTimeout(() => {
+                if (isFighting && currentEnemy) {
+                    demonAttackText.textContent = '⚡ ¡ATACA!';
+                    demonAttackText.style.color = '#ff4444';
+                    canAttack = false;
+                    attackBtn.disabled = true;
+                    battleLogUi.innerHTML = `⚠️ ¡${currentEnemy.name} ataca! ¡ESQUIVA!`;
+                    demonSprite.classList.add('attacking');
+                    createDemonProjectile();
+                    
+                    setTimeout(() => {
+                        demonSprite.classList.remove('attacking');
+                        if (isFighting && currentEnemy) {
+                            canAttack = true;
+                            attackBtn.disabled = false;
+                            demonAttackText.textContent = '⚡ ¡CONTRAATACA!';
+                            demonAttackText.style.color = '#00ff66';
+                            battleLogUi.innerHTML = `⚔️ ¡Ahora puedes atacar! Presiona ESPACIO.`;
+                            setTimeout(() => {
+                                if (isFighting && currentEnemy) {
+                                    demonAttackText.textContent = '⚡ PREPARANDO SIGUIENTE ATAQUE...';
+                                    demonAttackText.style.color = '#ffaa00';
+                                    setTimeout(() => {
+                                        if (isFighting && currentEnemy) startDemonCombat();
+                                    }, 2000);
+                                }
+                            }, 3000);
+                        }
+                    }, 800);
+                }
+            }, 1500);
+        }
+
+        function createDemonProjectile() {
+            if (!isFighting || !currentEnemy) return;
+            
+            const attackType = attackPattern[currentAttackIndex % attackPattern.length];
+            currentAttackIndex++;
+            
+            const projectile = document.createElement('div');
+            projectile.className = `demon-projectile ${attackType}`;
+            const emojis = { fire: '🔥', ice: '❄️', dark: '💀' };
+            projectile.textContent = emojis[attackType] || '💥';
+            
+            const demonRect = demonSprite.getBoundingClientRect();
+            const containerRect = document.getElementById('dungeon-map').getBoundingClientRect();
+            
+            const left = ((demonRect.left - containerRect.left) / containerRect.width) * 100;
+            const top = ((demonRect.top - containerRect.top) / containerRect.height) * 100;
+            
+            projectile.style.left = left + '%';
+            projectile.style.top = (top - 10) + '%';
+            projectile.style.position = 'absolute';
+            projectile.style.zIndex = '7';
+            projectile.style.fontSize = '2rem';
+            projectile.style.pointerEvents = 'none';
+            
+            const playerRect = hyakkiSprite.getBoundingClientRect();
+            const dx = playerRect.left - demonRect.left;
+            const dy = playerRect.top - demonRect.top;
+            const angle = Math.atan2(dy, dx);
+            
+            const speed = 2.5;
+            let projX = 0, projY = 0;
+            
+            document.getElementById('dungeon-map').appendChild(projectile);
+            
+            const moveInterval = setInterval(() => {
+                if (!isFighting || !currentEnemy || gameOver) {
+                    clearInterval(moveInterval);
+                    if (projectile.parentNode) projectile.remove();
+                    return;
+                }
+                
+                projX += Math.cos(angle) * speed;
+                projY += Math.sin(angle) * speed;
+                
+                const currentLeft = parseFloat(projectile.style.left) + projX;
+                const currentTop = parseFloat(projectile.style.top) + projY;
+                
+                projectile.style.left = currentLeft + '%';
+                projectile.style.top = currentTop + '%';
+                
+                const projRect = projectile.getBoundingClientRect();
+                const playerRect2 = hyakkiSprite.getBoundingClientRect();
+                
+                if (projRect.left < playerRect2.right && projRect.right > playerRect2.left &&
+                    projRect.top < playerRect2.bottom && projRect.bottom > playerRect2.top) {
+                    
+                    clearInterval(moveInterval);
+                    if (projectile.parentNode) projectile.remove();
+                    
+                    if (!gameOver && isFighting) {
+                        const damage = currentEnemy.damage || 2;
+                        playerHp = Math.max(0, playerHp - damage);
+                        updatePlayerHp();
+                        hyakkiSprite.classList.add('hit');
+                        battleLogUi.innerHTML = `💥 ¡Te ha golpeado! -${damage} HP (${playerHp}/${maxPlayerHp})`;
+                        
+                        setTimeout(() => hyakkiSprite.classList.remove('hit'), 300);
+                        
+                        if (playerHp <= 0) {
+                            gameOver = true;
+                            combatZone.classList.add('hidden');
+                            gameOverZone.classList.remove('hidden');
+                            battleLogUi.innerHTML = '💀 HAS MUERTO... Hyakkimaru ha caído.';
+                            clearInterval(moveInterval);
+                            if (projectile.parentNode) projectile.remove();
+                        }
+                    }
+                }
+                
+                if (currentLeft < 0 || currentLeft > 100 || currentTop < 0 || currentTop > 100) {
+                    clearInterval(moveInterval);
+                    if (projectile.parentNode) projectile.remove();
+                }
+            }, 30);
+        }
+
+        function performAttack() {
+            if (gameOver || isAttacking || currentHp <= 0 || attackBtn.disabled || !isFighting || !canAttack || puzzleActive || isTransitioning) return;
+            
+            isAttacking = true;
+            hyakkiSprite.classList.remove('idle', 'jumping', 'double-jumping', 'walk1', 'walk2');
+            hyakkiSprite.classList.add('attacking');
+            
+            slashEffect.classList.remove('active');
+            void slashEffect.offsetWidth;
+            slashEffect.classList.add('active');
+            slashEffect.style.left = (facingRight ? 70 : 30) + '%';
+            slashEffect.style.top = '35%';
+            
+            currentHp--;
+            updateHpBar();
+
+            if (currentHp > 0) {
+                battleLogUi.innerHTML = `⚔️ ¡Golpe! (❤️ ${currentHp}/${maxHp})`;
+            } else {
+                if (currentEnemy.isDemon) {
+                    const idx = defeatedDemonsCount;
+                    battleLogUi.innerHTML = `<strong style="color:#00ff66;">¡VENCIDO!</strong> ${currentEnemy.name}<br><span style="color:#00ff66;">¡Recuperaste ${bodyParts[idx]}!</span>`;
+                    defeatedDemonsCount++;
+                    demonCountUi.textContent = defeatedDemonsCount;
+                    demonAttackText.style.display = 'none';
+                    
+                    setTimeout(() => {
+                        if (defeatedDemonsCount < 12) {
+                            battleLogUi.innerHTML = `🚪 Saliendo de la mazmorra...`;
+                            toggleDungeon();
+                        }
+                    }, 1500);
+                }
+                
+                attackBtn.disabled = true;
+                isFighting = false;
+                canAttack = false;
+                currentEnemy = null;
+                demonSprite.style.display = 'none';
+                demonAttackText.style.display = 'none';
+                
+                if (defeatedDemonsCount >= 12) {
+                    combatZone.classList.add('hidden');
+                    winZone.classList.remove('hidden');
+                }
+            }
+
+            setTimeout(() => {
+                isAttacking = false;
+                hyakkiSprite.classList.remove('attacking');
+                if (!isJumping && !isMoving) hyakkiSprite.classList.add('idle');
+                slashEffect.classList.remove('active');
+            }, 450);
+        }
+
+        // ---- Física y movimiento ----
+        function checkPlatformCollision() {
+            if (isDropping) return; // Si está bajando, ignorar colisiones
+            
+            const platforms = document.querySelectorAll('.platform');
+            const playerBottom = posY + 10;
+            const playerLeft = posX - 5;
+            const playerRight = posX + 5;
+            
+            onPlatform = false;
+            
+            platforms.forEach(platform => {
+                const rect = platform.getBoundingClientRect();
+                const containerRect = document.getElementById('world-map').getBoundingClientRect();
+                
+                const platLeft = (rect.left - containerRect.left) / containerRect.width * 100;
+                const platTop = (rect.top - containerRect.top) / containerRect.height * 100;
+                const platWidth = (rect.width / containerRect.width) * 100;
+                const platHeight = (rect.height / containerRect.height) * 100;
+                
+                if (playerRight > platLeft && playerLeft < platLeft + platWidth) {
+                    if (playerBottom >= platTop && playerBottom <= platTop + platHeight + 2) {
+                        if (velocityY >= 0) {
+                            posY = platTop - 10;
+                            velocityY = 0;
+                            isJumping = false;
+                            jumpCount = 0;
+                            onPlatform = true;
+                            hyakkiSprite.style.top = posY + '%';
+                            detectionRing.style.top = posY + '%';
+                            if (!isMoving) {
+                                hyakkiSprite.classList.add('idle');
+                                hyakkiSprite.classList.remove('walk1', 'walk2');
+                            }
+                        }
+                    }
+                }
+            });
+            
+            if (posY >= 85 && !onPlatform) {
+                posY = 85;
+                velocityY = 0;
+                isJumping = false;
+                jumpCount = 0;
+                hyakkiSprite.style.top = posY + '%';
+                detectionRing.style.top = posY + '%';
+                if (!isMoving) hyakkiSprite.classList.add('idle');
+            }
+            
+            if (posY < 2) {
+                posY = 2;
+                velocityY = 0;
+                hyakkiSprite.style.top = posY + '%';
+                detectionRing.style.top = posY + '%';
+            }
+        }
+
+        function performJump() {
+            if (gameOver || isAttacking || puzzleActive || isTransitioning) return;
+            
+            if (!isJumping || jumpCount < maxJumps) {
+                if (!isJumping) {
+                    isJumping = true;
+                    jumpCount = 1;
+                    velocityY = -8;
+                    hyakkiSprite.classList.remove('idle');
+                    hyakkiSprite.classList.add('jumping');
+                } else if (jumpCount < maxJumps) {
+                    jumpCount++;
+                    velocityY = -7;
+                    hyakkiSprite.classList.remove('jumping');
+                    hyakkiSprite.classList.add('double-jumping');
+                    battleLogUi.innerHTML = '🦶 ¡Doble salto!';
+                }
+            }
+        }
+
+        function updatePhysics() {
+            if (inDungeon) {
+                if (isJumping || posY < 42) {
+                    velocityY += gravity;
+                    posY += velocityY;
+                    hyakkiSprite.style.top = posY + '%';
+                    detectionRing.style.top = posY + '%';
+                    if (posY >= 42) {
+                        posY = 42;
+                        velocityY = 0;
+                        isJumping = false;
+                        jumpCount = 0;
+                        hyakkiSprite.classList.remove('jumping', 'double-jumping');
+                        if (!isMoving) hyakkiSprite.classList.add('idle');
+                    }
+                }
+                return;
+            }
+            
+            if (isJumping || !onPlatform) {
+                velocityY += gravity;
+                posY += velocityY;
+                hyakkiSprite.style.top = posY + '%';
+                detectionRing.style.top = posY + '%';
+                checkPlatformCollision();
+                if (posY > 88) {
+                    posY = 85;
+                    velocityY = 0;
+                    isJumping = false;
+                    jumpCount = 0;
+                    hyakkiSprite.style.top = posY + '%';
+                    detectionRing.style.top = posY + '%';
+                    hyakkiSprite.classList.remove('jumping', 'double-jumping');
+                    if (!isMoving) hyakkiSprite.classList.add('idle');
+                }
+            }
+        }
+
+        function updateMovement() {
+            if (gameOver || puzzleActive || isTransitioning) return;
+            if (isAttacking || isAttackingEnemy) return;
+
+            let dx = 0;
+            if (keys.left) { dx = -2.5; facingRight = false; }
+            if (keys.right) { dx = 2.5; facingRight = true; }
+
+            const bounds = inDungeon ? { minX: 10, maxX: 85 } : { minX: 3, maxX: 93 };
+
+            if (dx !== 0) {
+                isMoving = true;
+                posX = Math.max(bounds.minX, Math.min(bounds.maxX, posX + dx));
+                hyakkiSprite.style.left = posX + '%';
+                detectionRing.style.left = posX + '%';
+                
+                hyakkiSprite.style.transform = facingRight ? 'scaleX(1)' : 'scaleX(-1)';
+                
+                hyakkiSprite.classList.remove('idle');
+                walkTimer++;
+                if (walkTimer % 6 < 3) {
+                    hyakkiSprite.classList.add('walk1');
+                    hyakkiSprite.classList.remove('walk2');
+                } else {
+                    hyakkiSprite.classList.add('walk2');
+                    hyakkiSprite.classList.remove('walk1');
+                }
+            } else {
+                if (isMoving) {
+                    isMoving = false;
+                    if (!isJumping) {
+                        hyakkiSprite.classList.add('idle');
+                        hyakkiSprite.classList.remove('walk1', 'walk2');
+                    }
+                }
+            }
+            
+            if (!puzzleActive && !inDungeon && !isFighting && !isTransitioning) {
+                checkAutoInteractions();
+                checkEnemyDamage();
+            }
+        }
+
+        function updatePlayerHp() {
+            const percent = (playerHp / maxPlayerHp) * 100;
+            playerHpBar.style.width = percent + '%';
+            playerHpDisplay.textContent = playerHp;
+            playerHpBar.style.background = playerHp <= 3 ? '#ff4444' : '#00cc66';
+        }
+
+        function updateHpBar() {
+            hpBarUi.style.width = ((currentHp / maxHp) * 100) + '%';
+        }
+
+        // ---- Bucle principal ----
+        function gameLoop() {
+            if (!inDungeon) {
+                updatePhysics();
+                checkPlatformCollision();
+            } else {
+                updatePhysics();
+            }
+            updateMovement();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // ---- Inicio ----
+        generateWorld();
+        updatePlayerHp();
+        demonSprite.style.display = 'none';
+        demonAttackText.style.display = 'none';
+        dungeonMap.style.display = 'none';
+        battleLogUi.innerHTML = `🌍 ¡Bienvenido a ${worldNames[0]}! Recoge 5 tesoros o resuelve 3 enigmas para abrir la puerta. ¡Ataca a los enemigos con ESPACIO!`;
+        attackBtn.disabled = true;
+        gameLoop();
+
+        // Eventos
+        attackBtn.addEventListener('click', performAttack);
+        puzzleSubmit.addEventListener('click', submitPuzzle);
+        puzzleInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') submitPuzzle();
+        });
+
+        console.log('🎮 Dororo - 12 Mundos');
+        console.log('⚔️ ¡Ataca a Ayakashis y Samuráis con ESPACIO!');
+        console.log('🍙 Recoge comida para curarte');
+        console.log('❤️ Recoge corazones para recuperar mucha vitalidad');
+        console.log('⬇ Presiona ↓ para bajar de las plataformas');
+        console.log('🌍 Mundos:');
+        worldNames.forEach((name, i) => console.log(`  ${i+1}. ${name}`));
+    </script>
+</body>
+</html>
